@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Xiang Su Liu · Estudiante de ASIR</title>
+  <meta name="description" content="Portafolio de Xiang Su Liu, estudiante de 2º de ASIR: redes, sistemas, CCNA y Docker." />
+  <meta name="theme-color" content="#0b1e3f" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='13' height='13' rx='2' fill='%2338bdf8'/%3E%3Crect x='17' y='2' width='13' height='13' rx='2' fill='%230ea5e9'/%3E%3Crect x='2' y='17' width='13' height='13' rx='2' fill='%230ea5e9'/%3E%3Crect x='17' y='17' width='13' height='13' rx='2' fill='%237dd3fc'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="desktop" id="desktop" aria-label="Escritorio">
+    <div class="wallpaper" aria-hidden="true">
+      <span class="glow glow-a"></span>
+      <span class="glow glow-b"></span>
+    </div>
+
+    <header class="desktop-greeting">
+      <p class="eyebrow">Portafolio</p>
+      <h1>Xiang Su Liu</h1>
+      <p class="role">Estudiante de ASIR</p>
+      <p class="hint">Haz doble clic (o toca) en un icono para abrirlo</p>
+    </header>
+
+    <aside class="sticky-note" aria-labelledby="stickyTitle">
+      <div class="sticky-bar" aria-hidden="true">
+        <svg class="sticky-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" /></svg>
+        <span class="sticky-dots"><i></i><i></i><i></i></span>
+      </div>
+      <div class="sticky-content">
+        <p class="sticky-kicker">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm2.6 3.9-1.4 3.8-3.8 1.4 1.4-3.8Z" /></svg>
+          Nota rápida
+        </p>
+        <h2 id="stickyTitle">Guía de navegación</h2>
+        <p>Bienvenido/a a mi portafolio profesional. Para acceder a la información, haga doble clic en las carpetas y archivos ubicados a la izquierda. Si lo prefiere, puede abrir o descargar directamente mi currículum en formato PDF.</p>
+        <div class="sticky-actions">
+          <a href="./sources/cv_xiang_su_liu.pdf" target="_blank" rel="noopener">Abrir CV</a>
+          <a href="./sources/cv_xiang_su_liu.pdf" download>Descargar PDF</a>
+        </div>
+      </div>
+    </aside>
+
+    <nav class="icons" id="icons" aria-label="Secciones del portafolio"></nav>
+
+    <div class="windows" id="windows"></div>
+  </main>
+
+  <!-- Menú Inicio -->
+  <div class="start-menu" id="startMenu" role="dialog" aria-label="Menú Inicio" hidden>
+    <div class="start-profile">
+      <div class="avatar" aria-hidden="true">XS</div>
+      <div>
+        <p class="start-name">Xiang Su Liu</p>
+        <p class="start-role">Estudiante de ASIR</p>
+      </div>
+    </div>
+    <p class="start-label">Secciones</p>
+    <ul class="start-list" id="startList"></ul>
+    <div class="start-footer">
+      <a class="start-cv" href="./sources/cv_xiang_su_liu.pdf" download>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14" /></svg>
+        Descargar CV (PDF)
+      </a>
+    </div>
+  </div>
+
+  <!-- Barra de tareas -->
+  <footer class="taskbar" aria-label="Barra de tareas">
+    <div class="taskbar-inner">
+      <button class="start-btn" id="startBtn" aria-label="Abrir menú Inicio" aria-expanded="false" aria-controls="startMenu">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="3" width="8.2" height="8.2" rx="1.4" />
+          <rect x="12.8" y="3" width="8.2" height="8.2" rx="1.4" />
+          <rect x="3" y="12.8" width="8.2" height="8.2" rx="1.4" />
+          <rect x="12.8" y="12.8" width="8.2" height="8.2" rx="1.4" />
+        </svg>
+      </button>
+      <div class="task-items" id="taskItems" role="toolbar" aria-label="Ventanas abiertas"></div>
+    </div>
+    <div class="tray">
+      <span class="tray-lang" aria-hidden="true">ESP</span>
+      <time class="clock" id="clock"></time>
+    </div>
+  </footer>
+
+  <script src="./js/app.js" defer></script>
+</body>
+</html>
