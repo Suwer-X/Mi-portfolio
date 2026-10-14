@@ -76,7 +76,7 @@ const SECTIONS = [
       <ul class="contact-list">
         <li>
           <span class="c-icon">${UI.mail}</span>
-          <div><p class="c-label">Email</p><a href="mailto:suwerxl@gmail.com">suwerxl@gmail.com</a></div>
+          <div><p class="c-label">Email</p><a href="mailto:xiangsuliu@outlook.com">xiangsuliu@outlook.com</a></div>
         </li>
         <li>
           <span class="c-icon">${UI.phone}</span>
