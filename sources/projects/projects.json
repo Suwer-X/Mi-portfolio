@@ -1,0 +1,34 @@
+{
+  "projects": [
+    {
+      "id": "9273dd0b-ae19-46f0-bdbc-54210b2d8912",
+      "name": "Nuevo proyecto",
+      "description": "",
+      "category": "",
+      "tags": [],
+      "date": "2026-10-16",
+      "file": "nuevo-proyecto/IMG_7393.jpg",
+      "size": 642468
+    },
+    {
+      "id": "0a524837-1e38-4b64-acb1-e28ab85522ea",
+      "name": "Conexión a equipos remotos",
+      "description": "Conexión a equipos remotos en Ubuntu server y Window server",
+      "category": "",
+      "tags": [],
+      "date": "2026-10-16",
+      "file": "conexion-a-equipos-remotos/Conexion-a-equipos-remotos.docx",
+      "size": 1109765
+    },
+    {
+      "id": "f1bf8fef-3af2-41d7-ae15-a7e96ec8283f",
+      "name": "Documento TFG",
+      "description": "TFG no final",
+      "category": "",
+      "tags": [],
+      "date": "2026-10-16",
+      "file": "dsdsa/tfg.pdf",
+      "size": 1900039
+    }
+  ]
+}
