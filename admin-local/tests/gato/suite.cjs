@@ -37,7 +37,8 @@ if(baseO)await T('2','Nada se desplaza (título, iconos, nota, barra) frente al 
  const out=[];
  for(const vp of [{width:1920,height:1080},{width:1366,height:768},{width:1024,height:700},{width:768,height:1024},{width:390,height:844},{width:360,height:640}]){
   const a=await page(b,base,{vp}),o=await page(b,baseO,{vp});await sleep(1400);
-  for(const s of sels){const ra=await rect(a.p,s),ro=await rect(o.p,s);ok(JSON.stringify(ra)===JSON.stringify(ro),`${vp.width}x${vp.height} ${s}: ahora ${ra} / antes ${ro}`)}
+  for(const s of sels){let ra=await rect(a.p,s),ro=await rect(o.p,s);if(s==='.icons'||s==='.desk-icon'){ra=ra.slice(0,3);ro=ro.slice(0,3)}   // la ALTURA de .icons baja a propósito (etiquetas más cortas); los iconos no se mueven (suite4 L4)
+  ok(JSON.stringify(ra)===JSON.stringify(ro),`${vp.width}x${vp.height} ${s}: ahora ${ra} / antes ${ro}`)}
   // el gato no pisa la nota adhesiva ni la barra de tareas ni el título
   const c=await rect(a.p,'.cat'),n=await rect(a.p,'.sticky-note'),vis=await a.p.$eval('.sticky-note',e=>getComputedStyle(e).display!=='none');
   const ov=(r1,r2)=>r1[0]<r2[0]+r2[2]&&r1[0]+r1[2]>r2[0]&&r1[1]<r2[1]+r2[3]&&r1[1]+r1[3]>r2[1];

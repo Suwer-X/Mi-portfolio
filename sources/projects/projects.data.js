@@ -1,0 +1,28 @@
+/* GENERADO AUTOMÁTICAMENTE desde sources/projects/projects.json — NO EDITAR A MANO.
+   Copia de solo lectura para abrir la web con file:// (el navegador no permite fetch() de archivos locales).
+   Con un servidor (Live Server, GitHub Pages) la web lee projects.json y NO usa este archivo.
+   Se regenera al pulsar «Guardar y publicar en local» o con: node tools/sync-catalog.cjs */
+window.__PORTFOLIO_CATALOG__ = {
+  "projects": [
+    {
+      "id": "0a524837-1e38-4b64-acb1-e28ab85522ea",
+      "name": "Conexión a equipos remotos",
+      "description": "Conexión a equipos remotos en Ubuntu server y Window server",
+      "category": "",
+      "tags": [],
+      "date": "2026-10-16",
+      "file": "conexion-a-equipos-remotos/Conexion-a-equipos-remotos.docx",
+      "size": 1109765
+    },
+    {
+      "id": "f1bf8fef-3af2-41d7-ae15-a7e96ec8283f",
+      "name": "Documento TFG",
+      "description": "TFG no final",
+      "category": "",
+      "tags": [],
+      "date": "2026-10-16",
+      "file": "dsdsa/tfg.pdf",
+      "size": 1900039
+    }
+  ]
+};

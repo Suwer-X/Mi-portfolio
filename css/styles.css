@@ -163,10 +163,22 @@ a { color: inherit; }
   filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.3));
 }
 .desk-name {
-  font-size: 13.5px;
+  /* Etiqueta bajo el icono: máx. 2 líneas, saltos solo entre palabras, «…» si algo es excepcionalmente largo */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.3;
+  letter-spacing: 0.01em;
   text-align: center;
-  word-break: break-word;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
+  text-wrap: balance;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 

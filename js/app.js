@@ -215,7 +215,16 @@ const SECTIONS = [
 ];
 
 // ... (El resto del código JS (Animaciones, ventanas, etc.) se mantiene igual) ...
-const DOWNLOAD_ICON = { file: 'cv_xiang_su_liu.pdf', href: './sources/cv_xiang_su_liu.pdf', icon: 'pdf' };
+// `file` = nombre real (se mantiene tal cual); `label` = nombre que se MUESTRA bajo el icono
+const DOWNLOAD_ICON = { file: 'cv_xiang_su_liu.pdf', label: 'CV Xiang Su Liu', href: './sources/cv_xiang_su_liu.pdf', icon: 'pdf' };
+
+// Texto bajo el icono: une con espacio de no separación las dos últimas palabras (y los conectores cortos como «y», «e», «de»
+// con la palabra siguiente) para que nunca quede una palabra o letra suelta en una línea. No cambia ningún nombre real.
+const deskLabel = (text) => {
+  const t = String(text).trim().replace(/\s+/g, ' ').replace(/(^| )(y|e|o|u|a|de|del|la|el|en|con)( )/gi, '$1$2\u00a0');
+  const i = t.lastIndexOf(' ');
+  return t.split(' ').length >= 3 && i > 0 ? `${t.slice(0, i)}\u00a0${t.slice(i + 1)}` : t;
+};
 
 /* ---------- Estado ---------- */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -242,7 +251,7 @@ function renderDesktopIcons() {
     btn.className = `desk-icon icon-${s.icon}`;
     btn.dataset.id = s.id;
     btn.setAttribute('aria-label', `Abrir ${s.label}`);
-    btn.innerHTML = `<span class="desk-glyph">${ICONS[s.icon]}</span><span class="desk-name">${s.file}</span>`;
+    btn.innerHTML = `<span class="desk-glyph">${ICONS[s.icon]}</span><span class="desk-name" title="${s.label}">${deskLabel(s.label)}</span>`;
     frag.appendChild(btn);
 
     const li = document.createElement('li');
@@ -255,7 +264,7 @@ function renderDesktopIcons() {
   cv.href = DOWNLOAD_ICON.href;
   cv.setAttribute('download', '');
   cv.setAttribute('aria-label', 'Descargar CV en PDF');
-  cv.innerHTML = `<span class="desk-glyph">${ICONS.pdf}</span><span class="desk-name">${DOWNLOAD_ICON.file}</span>`;
+  cv.innerHTML = `<span class="desk-glyph">${ICONS.pdf}</span><span class="desk-name" title="${DOWNLOAD_ICON.label}">${deskLabel(DOWNLOAD_ICON.label)}</span>`;
   frag.appendChild(cv);
 
   iconsEl.appendChild(frag);
