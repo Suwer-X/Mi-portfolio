@@ -17,7 +17,8 @@ const ICONS = {
   doc: `<svg viewBox="0 0 48 48" aria-hidden="true"><path class="i-page" d="M12 4h17l9 9v29a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path class="i-fold" d="M29 4v7a2 2 0 0 0 2 2h7"/><rect class="i-badge" x="6" y="22" width="22" height="14" rx="2.5"/><path class="i-badge-txt" d="m10 26 2 6 2-5 2 5 2-6"/></svg>`,
   sys: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect class="i-app" x="6" y="6" width="36" height="36" rx="5"/><path class="i-gear" d="M24 16.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm0-5v4m0 17v4m12.5-12.5h-4m-17 0h-4m20.3-8.8-2.8 2.8m-12 12-2.8 2.8m17.6 0-2.8-2.8m-12-12-2.8-2.8"/></svg>`,
   pdf: `<svg viewBox="0 0 48 48" aria-hidden="true"><path class="i-page" d="M12 4h17l9 9v29a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path class="i-fold" d="M29 4v7a2 2 0 0 0 2 2h7"/><path class="i-down" d="M24 19v13m0 0-5-5m5 5 5-5M17 37h14"/></svg>`,
-  work: `<svg viewBox="0 0 48 48" aria-hidden="true"><path class="i-down" d="M18 13v-3a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><rect class="i-app" x="4" y="13" width="40" height="27" rx="4"/><path class="i-bar" d="M4 26h40"/><rect class="i-dot" x="21" y="23" width="6" height="7" rx="1.5"/></svg>`,
+  work: `<svg viewBox="0 0 48 48" aria-hidden="true"><path class="i-down" d="M18 13v-3a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><rect class="i-app" x="4" y="13" width="40" height="27" rx="4"/><path class="i-bar" d="M4 26h40"/><rect class="i-dot" x="21" y="23" width="6" height="7" rx="1.5"/></svg>`,  // Gato del asistente: se dibuja con el mismo sprite que el gato del escritorio (js/cat.js)
+  cat: (window.PixelCat ? window.PixelCat.svg({ animated: false }) : ''),
 };
 
 const UI = {
@@ -198,6 +199,19 @@ const SECTIONS = [
     body: () => Projects.body(),
     onMount: (el) => Projects.mount(el),
   },
+  {
+    // Ventana del gato asistente (js/assistant.js). `hidden`: no tiene icono de escritorio ni entrada en Inicio;
+    // se abre con data-open="assistant" desde el gato, y reutiliza este mismo sistema de ventanas.
+    id: 'assistant',
+    file: 'Asistente_Gato.exe',
+    label: 'Asistente de búsqueda',
+    icon: 'cat',
+    width: 540,
+    height: 600,
+    hidden: true,
+    body: () => Assistant.body(),
+    onMount: (el) => Assistant.mount(el),
+  },
 ];
 
 // ... (El resto del código JS (Animaciones, ventanas, etc.) se mantiene igual) ...
@@ -223,7 +237,7 @@ const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)')
 function renderDesktopIcons() {
   const frag = document.createDocumentFragment();
 
-  SECTIONS.forEach((s) => {
+  SECTIONS.filter((s) => !s.hidden).forEach((s) => {
     const btn = document.createElement('button');
     btn.className = `desk-icon icon-${s.icon}`;
     btn.dataset.id = s.id;
@@ -302,7 +316,7 @@ function openWindow(id) {
   if (!isCompact()) {
     const area = windowsEl.getBoundingClientRect();
     const w = Math.min(section.width, area.width - 48);
-    const h = Math.min(area.height * 0.78, 720);
+    const h = section.height ? Math.min(section.height, area.height - 32) : Math.min(area.height * 0.78, 720);
     const offset = (cascade++ % 5) * 32;
     win.style.width = `${w}px`;
     win.style.height = `${h}px`;

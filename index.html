@@ -12,6 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="css/projects.css" />
+  <link rel="stylesheet" href="css/cat.css" />
+  <link rel="stylesheet" href="css/assistant.css" />
   
 </head>
 <body>
@@ -22,6 +24,13 @@
     </div>
 
     <header class="desktop-greeting">
+      <!-- Gato asistente: posición absoluta sobre el título (no ocupa espacio). Ver css/cat.css y js/cat.js -->
+      <div class="cat-slot" id="catSlot">
+        <button type="button" class="cat" data-open="assistant" title="Buscar proyectos" aria-label="Gato asistente: abrir el buscador de proyectos">
+          <span class="cat-sprite" aria-hidden="true"></span>
+        </button>
+        <p class="cat-bubble" hidden aria-hidden="true"></p>
+      </div>
       <p class="eyebrow">Portafolio</p>
       <h1>Xiang Su Liu</h1>
       <p class="role">Estudiante de ASIR</p>
@@ -91,6 +100,9 @@
   </footer>
 
   <script src="./js/projects.js" defer></script>
+  <script src="./js/search.js" defer></script>
+  <script src="./js/assistant.js" defer></script>
+  <script src="./js/cat.js" defer></script>
   <script src="./js/app.js" defer></script>
 </body>
 </html>

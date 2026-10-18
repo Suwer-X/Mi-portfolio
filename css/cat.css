@@ -1,0 +1,134 @@
+/* =========================================================
+   Portafolio · Xiang Su Liu — Gato pixel art
+   Archivo: css/cat.css  (se carga DESPUÉS de styles.css)
+
+   El gato vive dentro de .desktop-greeting, en un contenedor con
+   position:absolute: no ocupa sitio, así que NO mueve el título,
+   los iconos ni nada más.
+
+   Para cambiarlo:
+     tamaño   → --cat-size   (usa múltiplos de 16: 48, 64, 80… para píxeles nítidos)
+     posición → --cat-right (distancia al borde derecho del título)
+                --cat-gap   (separación entre el gato y el título)
+   ========================================================= */
+
+/* El gato no usa transiciones de tamaño/posición. (La regla global de «reducir movimiento» de styles.css
+   aplica 0.01 ms a todo y haría que las mediciones de js/cat.js leyesen valores a medias.) */
+.cat-slot, .cat { transition: none !important; }
+
+.cat-slot {
+  --cat-size: 64px;
+  --cat-right: 0px;
+  --cat-gap: 8px;
+  position: absolute;
+  right: var(--cat-right);
+  bottom: 100%;
+  margin-bottom: var(--cat-gap);
+  width: var(--cat-size);
+  height: var(--cat-size);
+  pointer-events: none;          /* el contenedor no captura clics; solo el botón */
+}
+
+.cat {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border-radius: 8px;
+  background: none;              /* sin caja ni tarjeta */
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.cat:focus-visible { outline: 2px solid var(--cyan-400); outline-offset: 4px; }
+
+.cat-sprite { display: block; width: 100%; height: 100%; }
+.cat-sprite svg,
+.cat-sprite img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;    /* píxeles definidos, sin suavizado */
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 6px rgba(2, 10, 28, 0.4));
+  transition: filter 0.15s;
+}
+.cat:hover .cat-sprite svg,
+.cat:hover .cat-sprite img { filter: drop-shadow(0 4px 6px rgba(2, 10, 28, 0.4)) brightness(1.08); }
+
+/* Animación por fotogramas (js/cat.js cambia data-f de cada pieza: ojos, oreja izquierda, oreja derecha).
+   0 = reposo (el sprite original), 1 = pose (ojos cerrados / oreja inclinada). Solo se dibuja el fotograma activo. */
+.cat-part > .fr { display: none; }
+.cat-part[data-f="0"] > .fr0,
+.cat-part[data-f="1"] > .fr1 { display: inline; }
+
+/* La cola conserva su pequeño movimiento de un píxel */
+.cat-tail { animation: cat-tail 5s steps(1, end) infinite; }
+
+@keyframes cat-tail {
+  0%, 78%, 100% { transform: translateY(0); }
+  80%           { transform: translateY(-1px); }
+  86%           { transform: translateY(0); }
+  88%           { transform: translateY(-1px); }
+  94%           { transform: translateY(0); }
+}
+
+/* Globo de texto (saludo y mensajes ocasionales): no recibe clics ni foco */
+.cat-bubble {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  width: max-content;
+  max-width: min(240px, 60vw);
+  margin: 0;
+  padding: 9px 13px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--ink);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 26px -10px rgba(2, 10, 28, 0.6), 0 0 0 1px rgba(2, 10, 28, 0.06);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(6px, -50%);
+  transition: opacity 0.2s var(--ease), transform 0.22s var(--ease);
+}
+.cat-bubble.is-in { opacity: 1; transform: translate(0, -50%); }
+.cat-bubble::after {             /* piquito hacia el gato */
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 2px;
+}
+
+/* Pantallas de poca altura (portátiles): la nota adhesiva existente ocuparía el sitio del gato.
+   js/cat.js detecta el solape y prueba, por este orden (48 px, sin mover ni tapar la nota):
+     .is-side → al margen derecho, junto a la esquina del título   (pantallas anchas)
+     .is-left → encima del extremo izquierdo del título            (≤ 1180 px: la nota llega hasta el borde)
+   En estos modos no se muestran globos de texto. */
+.cat-slot.is-moved { --cat-size: 48px; }
+.cat-slot.is-side { --cat-right: calc(8px - clamp(32px, 6vw, 96px)); }   /* queda dentro del margen derecho */
+.cat-slot.is-left { right: auto; left: 0; }
+
+/* Móvil: el título pasa a la izquierda y el gato se queda arriba a la derecha, en la franja libre */
+@media (max-width: 760px) {
+  .cat-slot {
+    --cat-size: 48px;
+    --cat-right: 24px;
+    right: var(--cat-right);
+    top: 8px;
+    bottom: auto;
+    margin-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-tail { animation: none !important; }
+  .cat-bubble { transition: none; }
+}

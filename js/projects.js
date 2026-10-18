@@ -14,6 +14,9 @@
   /* ---------- Configuración ---------- */
   const CONFIG = {
     manifestUrl: './sources/projects/projects.json',
+    // Copia GENERADA del catálogo (admin-local / tools/sync-catalog.cjs). Solo se usa abriendo la web con file://,
+    // donde el navegador bloquea fetch(). Con servidor (Live Server, GitHub Pages) NO se carga: manda projects.json.
+    dataScriptUrl: './sources/projects/projects.data.js',
     filesBase: './sources/projects/',
     textPreviewChars: 120000,
     toastMs: 4500,
@@ -139,6 +142,7 @@
     loading: null,
   };
   let ui = null;          // referencias al DOM de la ventana montada
+  let pendingReveal = null; // id de un proyecto que el asistente quiere mostrar cuando la ventana esté pintada
 
   /* ---------- Carga de datos ---------- */
   function normalizePublished(p, i) {
@@ -190,23 +194,45 @@
 
   const loadError = (kind, detail, cause) => Object.assign(new Error(detail), { kind, detail, cause });
 
+  const isFileProtocol = () => location.protocol === 'file:';
+
+  // file://: el catálogo llega como script (window.__PORTFOLIO_CATALOG__); un <script src> sí está permitido
+  function loadFromScript() {
+    const url = CONFIG.dataScriptUrl;
+    return new Promise((resolve, reject) => {
+      try { delete window.__PORTFOLIO_CATALOG__; } catch { window.__PORTFOLIO_CATALOG__ = undefined; }
+      const el = document.createElement('script');
+      el.src = `${url}?t=${Date.now()}`;
+      el.onload = () => {
+        el.remove();
+        const data = window.__PORTFOLIO_CATALOG__;
+        if (data === undefined) return reject(loadError('format', `${url} no define el catálogo (¿se ha editado a mano? vuelve a generarlo: «Guardar y publicar en local» o «node tools/sync-catalog.cjs»)`));
+        resolve(data);
+      };
+      el.onerror = () => { el.remove(); reject(loadError('missing', `La web está abierta con file:// y no se encuentra ${url}. Se genera al publicar desde el administrador o con «node tools/sync-catalog.cjs»; o abre la web con Live Server`)); };
+      document.head.append(el);
+    });
+  }
+
   async function loadPublished() {
     const url = CONFIG.manifestUrl;
     try {
-      let res;
-      try { res = await fetch(url, { cache: 'no-cache' }); }
-      catch (netErr) {
-        throw loadError('network', `No se pudo pedir ${url}${location.protocol === 'file:' ? ' (la web está abierta con file://: ábrela con Live Server o un servidor web)' : ''}`, netErr);
-      }
-      if (!res.ok) throw loadError('http', `${url} respondió HTTP ${res.status}${res.status === 404 ? ' (el archivo no existe: ¿se ha publicado ya el catálogo?)' : ''}`);
       let data;
-      try { data = await res.json(); } catch (jsonErr) { throw loadError('json', `${url} no es JSON válido (${jsonErr.message})`, jsonErr); }
+      if (isFileProtocol()) {
+        data = await loadFromScript();
+      } else {
+        let res;
+        try { res = await fetch(url, { cache: 'no-cache' }); }
+        catch (netErr) { throw loadError('network', `No se pudo pedir ${url}`, netErr); }
+        if (!res.ok) throw loadError('http', `${url} respondió HTTP ${res.status}${res.status === 404 ? ' (el archivo no existe: ¿se ha publicado ya el catálogo?)' : ''}`);
+        try { data = await res.json(); } catch (jsonErr) { throw loadError('json', `${url} no es JSON válido (${jsonErr.message})`, jsonErr); }
+      }
       const list = Array.isArray(data) ? data : data && data.projects;
-      if (!Array.isArray(list)) throw loadError('format', `${url} no tiene el formato esperado: { "projects": [ … ] }`);
+      if (!Array.isArray(list)) throw loadError('format', `${isFileProtocol() ? CONFIG.dataScriptUrl : url} no tiene el formato esperado: { "projects": [ … ] }`);
       const items = list.map(normalizePublished);
       state.published = items.filter(Boolean);
       const skipped = items.length - state.published.length;
-      if (skipped) console.warn(`[Proyectos] ${skipped} de ${items.length} entradas de ${url} se han ignorado (borrador o datos no válidos: sin archivo ni enlace, ruta con «..», etc.).`);
+      if (skipped) console.warn(`[Proyectos] ${skipped} de ${items.length} entradas del catálogo se han ignorado (borrador o datos no válidos: sin archivo ni enlace, ruta con «..», etc.).`);
     } catch (err) {
       state.publishedError = err;
       console.error('[Proyectos] No se pudo cargar el catálogo →', err.detail || err.message, err.cause || '');
@@ -220,6 +246,47 @@
 
   const urlOf = (it) => it.url;
   const extLabel = (it) => (it.kind === 'link' ? 'WEB' : (getExt(it.fileName) || KINDS[it.kind].label).slice(0, 6).toUpperCase());
+
+  /* ---------- API para otros módulos (asistente del gato) ----------
+     Comparten el MISMO catálogo ya cargado y normalizado: no hay una segunda lista ni una segunda petición.
+     Los borradores ya se han descartado en normalizePublished(). */
+  const isLocalDebug = () => location.protocol === 'file:' || /^(localhost|127\.|\[?::1)/.test(location.hostname) || /[?&]debug=1\b/.test(location.search);
+
+  async function getCatalog({ retry = false } = {}) {
+    // Solo se vuelve a pedir si la carga anterior falló (así no cambian los ids de las tarjetas ya pintadas)
+    if (retry && state.publishedError) { state.publishedError = null; state.loading = null; }
+    const wasEmpty = !state.published.length;
+    await ensureLoaded();
+    if (retry && wasEmpty && !state.publishedError && ui?.pj?.isConnected) renderAll();
+    const err = state.publishedError;
+    return {
+      items: state.published.map((it) => ({ ...it, tags: it.tags.slice(), extraFiles: it.extraFiles.slice(), extraLinks: it.extraLinks.slice() })),
+      error: err ? { kind: err.kind || 'unknown', detail: isLocalDebug() ? (err.detail || err.message || '') : '' } : null,
+    };
+  }
+
+  const canPreview = (id) => { const it = allItems().find((i) => i.id === id); return !!it && KINDS[it.kind].preview; };
+
+  // Marca la tarjeta, la lleva a la vista y, si el archivo tiene vista previa, abre el visor existente
+  function revealNow(id) {
+    const el = cardEl(id);
+    const it = allItems().find((i) => i.id === id);
+    if (!el || !it) return false;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    ui.grid.querySelectorAll('.pj-card.is-found').forEach((x) => x.classList.remove('is-found'));
+    el.classList.add('is-found');
+    setTimeout(() => el.classList.remove('is-found'), 2600);
+    if (KINDS[it.kind].preview) openViewer(it);
+    return true;
+  }
+
+  // Si la ventana de Proyectos ya está pintada actúa al momento; si no, lo hará renderAll() al terminar de montarla
+  function reveal(id) {
+    pendingReveal = id;
+    if (ui?.pj?.isConnected && ui.grid.querySelector('.pj-card')) { pendingReveal = null; return revealNow(id); }
+    return true;
+  }
 
   /* ---------- Avisos (toasts) ---------- */
   let toastBox = null;
@@ -352,6 +419,7 @@
   }
 
   async function fillText(pre, item) {
+    if (isFileProtocol()) { pre.textContent = 'La vista previa de texto no está disponible con la web abierta como archivo (file://): el navegador no permite leer archivos locales desde la página. Descarga el archivo o abre la web con Live Server.'; return; }
     try {
       let text;
       let truncated = false;
@@ -422,7 +490,7 @@
 
   async function hydrateSnippet(el, item) {
     const pre = el.querySelector('[data-snippet]');
-    if (!pre) return;
+    if (!pre || isFileProtocol()) return;   // con file:// no hay fetch(): se queda el marcador de posición
     try {
       let text;
       const res = await fetch(item.url, { headers: { Range: 'bytes=0-1999' } });
@@ -476,6 +544,7 @@
     allItems().forEach((item, i) => ui.grid.append(buildCard(item, Math.min(i, 8) * 45)));
     updateCount();
     updateEmpty();
+    if (pendingReveal) { const id = pendingReveal; pendingReveal = null; requestAnimationFrame(() => revealNow(id)); }
   }
 
   /* ---------- Eventos de la ventana ---------- */
@@ -513,5 +582,5 @@
     renderAll();
   }
 
-  window.Projects = { body, mount };
+  window.Projects = { body, mount, getCatalog, reveal, canPreview };
 })();
