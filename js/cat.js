@@ -206,19 +206,20 @@
     const assistantOpen = () => !!document.querySelector('.window[data-id="assistant"]');
     const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Si el gato choca con la nota adhesiva (poca altura), se aparta: primero al margen derecho y, si no cabe, a la izquierda del título
-    const MODES = [[], ['is-moved', 'is-side'], ['is-moved', 'is-left']];
+    // Si el gato chocaría con la nota adhesiva (poca altura), se posa sobre el extremo izquierdo del título
     function fit() {
+      slot.classList.remove('is-perch');
       const note = document.querySelector('.sticky-note');
-      const noteShown = note && getComputedStyle(note).display !== 'none';
-      const apply = (cls) => { slot.classList.remove('is-moved', 'is-side', 'is-left'); cls.forEach((c) => slot.classList.add(c)); };
-      apply(MODES[0]);
-      if (!noteShown) return;
+      if (!note || getComputedStyle(note).display === 'none') return;
       const desk = note.offsetParent ? note.offsetParent.getBoundingClientRect() : { left: 0, top: 0 };
       const n = { left: desk.left + note.offsetLeft, top: desk.top + note.offsetTop, right: desk.left + note.offsetLeft + note.offsetWidth, bottom: desk.top + note.offsetTop + note.offsetHeight };
       const pad = 8;   // la nota entra con una pequeña animación: se deja holgura
-      const clash = () => { const c = btn.getBoundingClientRect(); return c.left < n.right + pad && c.right > n.left - pad && c.top < n.bottom + pad && c.bottom > n.top - pad; };
-      for (const cls of MODES) { apply(cls); if (!clash()) return; }
+      const c = btn.getBoundingClientRect();
+      if (c.left < n.right + pad && c.right > n.left - pad && c.top < n.bottom + pad && c.bottom > n.top - pad) {
+        const h1 = slot.parentElement && slot.parentElement.querySelector('h1');
+        if (h1) slot.style.setProperty('--cat-perch', `${h1.offsetTop}px`);
+        slot.classList.add('is-perch');
+      }
     }
     fit();
     let raf = 0;
@@ -228,7 +229,7 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit).catch(() => {});
 
     function say(text) {
-      if (document.hidden || assistantOpen() || slot.classList.contains('is-moved')) return false;
+      if (document.hidden || assistantOpen() || slot.classList.contains('is-perch')) return false;
       clearTimeout(hideTimer);
       bubble.textContent = text;
       bubble.hidden = false;

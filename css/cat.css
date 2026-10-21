@@ -108,13 +108,17 @@
 }
 
 /* Pantallas de poca altura (portátiles): la nota adhesiva existente ocuparía el sitio del gato.
-   js/cat.js detecta el solape y prueba, por este orden (48 px, sin mover ni tapar la nota):
-     .is-side → al margen derecho, junto a la esquina del título   (pantallas anchas)
-     .is-left → encima del extremo izquierdo del título            (≤ 1180 px: la nota llega hasta el borde)
-   En estos modos no se muestran globos de texto. */
-.cat-slot.is-moved { --cat-size: 48px; }
-.cat-slot.is-side { --cat-right: calc(8px - clamp(32px, 6vw, 96px)); }   /* queda dentro del margen derecho */
-.cat-slot.is-left { right: auto; left: 0; }
+   js/cat.js detecta el solape y lo hace «posarse» sobre el título, en su extremo izquierdo (a donde la nota no llega):
+   mismo tamaño, apoyado en las letras. --cat-perch (la altura del título dentro del bloque) la calcula cat.js.
+   Para subir o bajar al gato en ese modo, cambia --cat-perch-gap. En este modo no se muestran globos de texto. */
+.cat-slot.is-perch {
+  --cat-perch-gap: 2px;
+  right: auto;
+  left: 0;
+  bottom: auto;
+  margin-bottom: 0;
+  top: calc(var(--cat-perch, 40px) - var(--cat-size) - var(--cat-perch-gap));
+}
 
 /* Móvil: el título pasa a la izquierda y el gato se queda arriba a la derecha, en la franja libre */
 @media (max-width: 760px) {
