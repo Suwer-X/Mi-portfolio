@@ -24,6 +24,25 @@ window.__PORTFOLIO_CATALOG__ = {
       "size": 515831
     },
     {
+      "id": "0bbf5591-68a4-4b0b-bcff-96a226f433ee",
+      "name": "Implementación de Infraestructura DNS Corporativa Tolerante a Fallos (Windows Server)",
+      "description": "Despliegue de un sistema DNS centralizado y tolerante a fallos en Windows Server. Incluye configuración de zonas de búsqueda directa e inversa, sincronización entre servidor primario y secundario, y gestión de registros A, CNAME, PTR y MX para soportar servicios críticos como FTP y correo.",
+      "category": "Redes, Sistemas",
+      "tags": [
+        "Windows Server",
+        "DNS",
+        "Redes",
+        "SysAdmin",
+        "Infraestructura IT",
+        "Alta Disponibilidad",
+        "Registros MX",
+        "PTR."
+      ],
+      "date": "2026-11-09",
+      "file": "nuevo-proyectodsadas/Dns-win-server.pdf",
+      "size": 1592609
+    },
+    {
       "id": "40575b2d-bc3a-4904-97fd-9713513bd925",
       "name": "DHCP en Windows Server",
       "description": "Implementación del rol DHCP en Windows Server para direccionamiento IPv4 en red segmentada. Configuración de múltiples ámbitos con CIDR /25 para VLANs. Incluye optimización mediante políticas de exclusión de rangos y reservas estáticas por MAC, garantizando la identidad fija de equipos críticos.",
